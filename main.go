@@ -2,18 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/julienschmidt/httprouter"
+	"net/http"
+	"strings"
 )
 
-func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s! I'm server3. \n", ps.ByName("name"))
+func Hello(w http.ResponseWriter, r *http.Request) {
+	name := strings.TrimPrefix(r.URL.Path, "/hello/")
+	fmt.Fprintf(w, "hello, %s! I'm server3. \n", name)
 }
 
 func main() {
-	router := httprouter.New()
-	router.GET("/hello/:name", Hello)
-	log.Fatal(http.ListenAndServe(":8083", router))
+	http.HandleFunc("/hello/", Hello)
+	otelHandler := otelhttp.NewHandler(http.HandlerFunc(Hello), "Hello")
+	http.ListenAndServe(":8083", otelHandler)
 }
