@@ -57,7 +57,7 @@ func installExportPipeline(ctx context.Context) func() {
 	// 2.请将AOS_COLLECTOR_ENDPOINT设置为从
 	otelAgentAddr, ok := os.LookupEnv("AOS_COLLECTOR_ENDPOINT")
 	if !ok {
-		otelAgentAddr = "0.0.0.0:4317"
+		otelAgentAddr = "aos-user-gateway-collector.kube-system.svc.cluster.local:4317"
 	}
 
 	// 3.设置一个新的GRPC Trace Client并绑定之前设置的上报端口
